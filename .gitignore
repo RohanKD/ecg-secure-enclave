@@ -1,0 +1,30 @@
+# Build artifacts
+*.bit
+*.bin
+*.ltx
+*.dcp
+*.jou
+*.log
+*.str
+*.xpr
+reports/
+.Xil/
+vivado*.backup*
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+*.egg-info/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Vivado installer
+Xilinx_Unified_*.bin
+
+# Simulation
+*.vcd
+*.vvp
