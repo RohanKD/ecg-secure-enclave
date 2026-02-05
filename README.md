@@ -1,25 +1,26 @@
 # ECG Secure Enclave
 
-FPGA-based secure enclave for medical ECG on **Basys 3 (Artix-7 XC7A35T)**.
+FPGA-based secure enclave for medical ECG on Basys 3 (Artix-7 XC7A35T).
 
-## Concept
-Raw ECG data is confined within FPGA fabric. Only AES-128 encrypted samples and plaintext arrhythmia classification are output.
+## Architecture (WIP)
+```
+AD8232 → XADC → Voltage Scaler → QRS Detection → Feature Extraction → MLP Classifier
+                                       ↓
+                                  AES-128 Encrypt → UART
+```
 
-## Platform: Basys 3
-- Xilinx Artix-7 XC7A35T (20,800 LUTs, 90 DSP slices)
-- Built-in XADC: 12-bit, 1 MSPS — direct analog ECG input
-- On-board VGA, UART, 7-segment, LEDs
-- Estimated utilization: ~29% LUT, 8% FF, 12% BRAM
-
-## ECG Frontend: AD8232
-- Single-lead heart rate monitor analog front end
-- 20k/10k voltage divider for XADC input scaling
+## Algorithm: Pan-Tompkins QRS Detection
+Implemented reference Python version. Pipeline stages:
+1. Bandpass filter (5–15 Hz)
+2. Derivative filter (5-point)
+3. Squaring
+4. Moving window integration (150 ms)
+5. Adaptive thresholding with refractory period
 
 ## Status
-- [x] Market research
-- [x] Patent landscape
+- [x] Market research & patents
 - [x] Platform selection (Basys 3)
-- [x] Feasibility analysis
-- [ ] Algorithm research
+- [x] Pan-Tompkins Python reference
+- [ ] AES-128 & MLP research
 - [ ] Architecture design
 - [ ] RTL implementation
