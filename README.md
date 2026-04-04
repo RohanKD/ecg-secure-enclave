@@ -1,33 +1,63 @@
-# ECG Secure Enclave
+# ECG Secure Enclave — FPGA-Based Medical ECG with Hardware-Enforced HIPAA Compliance
 
-FPGA-based secure enclave for medical ECG on Basys 3 (Artix-7 XC7A35T).
-Hardware-enforced HIPAA compliance — raw ECG never leaves the FPGA unencrypted.
+A hardware security architecture for medical ECG acquisition, classification, and encryption on a Xilinx Artix-7 FPGA (Basys 3). Raw ECG data never leaves the FPGA unencrypted — only AES-128 ciphertext and plaintext arrhythmia classification are output.
 
 ## Architecture
-See [docs/architecture_design.md](docs/architecture_design.md) for full module hierarchy and dataflow.
 
 ```
-top_basys3
-├── clk_divider, xadc_interface, voltage_scaler
-├── ecg_pipeline (qrs_detector + feature_extractor)
-├── mlp_classifier (weight_rom + mac_unit + relu)
-├── aes128_encrypt (sbox + shift_rows + mix_columns + key_expansion)
-├── output_mux + uart_tx
-├── vga_controller + vga_waveform + vga_text + font_rom
-└── seven_seg + led_status
+AD8232 → XADC → Voltage Scaler → ECG Pipeline → MLP Classifier → UART (classification)
+                                      ↓
+                                 AES-128 Encrypt → UART (encrypted ECG)
+                                      ↓
+                                 VGA Display (local only)
 ```
 
-## Resource Budget
-| Resource | Used | Available | Utilization |
-|----------|------|-----------|-------------|
-| LUTs | ~6,050 | 20,800 | 29% |
-| FFs | ~3,480 | 41,600 | 8% |
-| BRAM | 6 | 50 | 12% |
-| DSP | 7 | 90 | 8% |
+## Key Features
 
-## Status
-- [x] Research & feasibility
-- [x] Algorithm prototyping (Python)
-- [x] Architecture design
-- [x] Pin constraints (XDC)
-- [ ] RTL implementation (starting next week)
+- **Hardware-enforced data isolation**: Raw ECG samples exist only within the FPGA fabric
+- **Real-time QRS detection**: Pan-Tompkins algorithm implemented in streaming hardware
+- **On-chip arrhythmia classification**: 10→8→2 MLP neural network in fixed-point arithmetic
+- **AES-128 encryption**: NIST FIPS-197 compliant, encrypts every sample before UART output
+- **Live monitoring**: VGA waveform display + 7-segment BPM + LED status indicators
+
+## Platform
+
+- **FPGA**: Digilent Basys 3 (Xilinx Artix-7 XC7A35T)
+- **ECG Frontend**: AD8232 single-lead heart rate monitor
+- **Resource Usage**: ~29% LUT, 8% FF, 12% BRAM, 8% DSP
+
+## Repository Structure
+
+```
+rtl/            — Verilog RTL source (33 modules)
+sim/            — Testbenches and test data
+mem/            — Weight and font ROM initialization files
+python/         — Host tools (UART monitor, training, verification)
+constraints/    — Basys 3 pin assignments (XDC)
+docs/           — Research notes and design documents
+scripts/        — Build and setup scripts
+```
+
+## Building
+
+Requires Vivado ML Standard (free) with Artix-7 device support:
+
+```bash
+vivado -mode batch -source build.tcl
+```
+
+Programming the FPGA (Mac):
+```bash
+openFPGALoader -b basys3 ecg_secure_enclave.bit
+```
+
+## Verification
+
+| Test | Result |
+|------|--------|
+| AES-128 (3 NIST vectors) | PASS |
+| QRS Detection (60 BPM) | PASS |
+| MLP Classification | PASS |
+| Interface Consistency (30 ports) | PASS |
+
+## Georgia Tech Create-X I2P — Spring 2026
