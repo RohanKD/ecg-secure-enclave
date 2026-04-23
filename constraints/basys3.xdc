@@ -82,10 +82,9 @@ set_property -dict { PACKAGE_PIN C17  IOSTANDARD LVCMOS33 } [get_ports leads_off
 set_property -dict { PACKAGE_PIN D18  IOSTANDARD LVCMOS33 } [get_ports leads_off_n]
 
 ## XADC Dedicated Analog Inputs (JXADC header) - VAUX6
-## These are analog pins and do not need IOSTANDARD
-## vauxp6 = J3, vauxn6 = K3 on JXADC header
-## Note: Analog pins are configured via XADC instantiation, not pin constraints
-## The XADC analog input pins are dedicated and do not require LOC constraints.
+## Analog pins need PACKAGE_PIN but NO IOSTANDARD (they use dedicated analog routing)
+set_property PACKAGE_PIN J3 [get_ports vauxp6]
+set_property PACKAGE_PIN K3 [get_ports vauxn6]
 
 ## Configuration
 set_property CONFIG_VOLTAGE 3.3 [current_design]
