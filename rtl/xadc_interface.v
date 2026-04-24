@@ -19,8 +19,8 @@ module xadc_interface(
     input  wire        clk,
     input  wire        rst,
     input  wire        tick_500hz,
-    input  wire        vauxp6,      // Analog positive input
-    input  wire        vauxn6,      // Analog negative input
+    // Note: VAUX6 analog pins (J3/K3) connect through dedicated XADC
+    // analog routing — no top-level ports or IO buffers needed.
     output reg  [11:0] sample_data,
     output reg         sample_valid
 );
@@ -91,8 +91,9 @@ module xadc_interface(
         .VP         (1'b0),
         .VN         (1'b0),
         // Auxiliary analog inputs - only VAUX6 connected
-        .VAUXP      ({9'b0, vauxp6, 6'b0}),   // VAUXP[6]
-        .VAUXN      ({9'b0, vauxn6, 6'b0}),   // VAUXN[6]
+        // VAUX6 uses dedicated analog routing (no IBUF needed)
+        .VAUXP      (16'b0),
+        .VAUXN      (16'b0),
         // Alarm enables
         .CONVST     (1'b0),
         .CONVSTCLK  (1'b0)

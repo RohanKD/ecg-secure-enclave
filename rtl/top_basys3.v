@@ -19,10 +19,6 @@ module top_basys3(
     // sw[0]: encryption enable
     // sw[1]: VGA mode (0=waveform, 1=encrypted hex display)
 
-    // XADC analog inputs (JXADC header, VAUX6)
-    input  wire        vauxp6,
-    input  wire        vauxn6,
-
     // AD8232 leads-off detection (Pmod JA)
     input  wire        leads_off_p,
     input  wire        leads_off_n,
@@ -123,8 +119,6 @@ module top_basys3(
         .clk         (clk_100mhz),
         .rst         (rst),
         .tick_500hz  (tick_500hz),
-        .vauxp6      (vauxp6),
-        .vauxn6      (vauxn6),
         .sample_data (raw_adc),
         .sample_valid(raw_adc_valid)
     );
